@@ -76,15 +76,17 @@ public class RegisterUserMySQL {
         // - SELECT tabel MAHASISWA
         // - SELECT tabel MATAKULIAH
         // - SELECT tabel DOSEN
-        // - [BARU] SELECT, INSERT, UPDATE tabel TUGAS  ← DITAMBAHKAN
+        // - SELECT, INSERT, UPDATE, DELETE tabel TUGAS
+        // - SELECT, INSERT, UPDATE tabel ABSENSI
 
         String sqlGrant1 = "GRANT SELECT, INSERT, UPDATE ON SBAU.krs TO '" + nidn + "'@'localhost'";
         String sqlGrant2 = "GRANT SELECT ON SBAU.mahasiswa TO '" + nidn + "'@'localhost'";
         String sqlGrant3 = "GRANT SELECT ON SBAU.matakuliah TO '" + nidn + "'@'localhost'";
         String sqlGrant4 = "GRANT SELECT ON SBAU.dosen TO '" + nidn + "'@'localhost'";
-        String sqlGrant5 = "GRANT SELECT, INSERT, UPDATE ON SBAU.tugas TO '" + nidn + "'@'localhost'"; // <--- BARU
+        String sqlGrant5 = "GRANT SELECT, INSERT, UPDATE, DELETE ON SBAU.tugas TO '" + nidn + "'@'localhost'";
+        String sqlGrant6 = "GRANT SELECT, INSERT, UPDATE ON SBAU.absensi TO '" + nidn + "'@'localhost'";
 
-        String allGrants = sqlGrant1 + "; " + sqlGrant2 + "; " + sqlGrant3 + "; " + sqlGrant4 + "; " + sqlGrant5;
+        String allGrants = sqlGrant1 + "; " + sqlGrant2 + "; " + sqlGrant3 + "; " + sqlGrant4 + "; " + sqlGrant5 + "; " + sqlGrant6;
 
         executeKueriUser(sqlCreate, allGrants, "Dosen " + nidn);
     }

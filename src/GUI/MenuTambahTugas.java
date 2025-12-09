@@ -292,7 +292,7 @@ public class MenuTambahTugas extends JFrame {
             spDesk.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // ===================== DEADLINE =====================
-            JLabel lblDeadline = new JLabel("Deadline");
+            JLabel lblDeadline = new JLabel("Deadline (YYYY-MM-DD)");
             lblDeadline.setFont(labelFont);
             lblDeadline.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -416,7 +416,7 @@ public class MenuTambahTugas extends JFrame {
             spDesk.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // ===================== DEADLINE =====================
-            JLabel lblDeadline = new JLabel("Deadline");
+            JLabel lblDeadline = new JLabel("Deadline (YYYY-MM-DD)");
             lblDeadline.setFont(labelFont);
             lblDeadline.setAlignmentX(Component.LEFT_ALIGNMENT);
 

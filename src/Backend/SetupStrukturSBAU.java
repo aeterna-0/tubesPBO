@@ -63,6 +63,19 @@ public class SetupStrukturSBAU {
                 )
             """);
 
+            stmt.execute("""
+                CREATE TABLE absensi (
+                    nim VARCHAR(20),
+                    kode_mk VARCHAR(20),
+                    pertemuan_ke INT,
+                    status ENUM('Hadir', 'Sakit', 'Izin', 'Alpha'),
+                    tanggal DATE,
+                    PRIMARY KEY (nim, kode_mk, pertemuan_ke),
+                    FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+                    FOREIGN KEY (kode_mk) REFERENCES matakuliah(kode_mk)
+                )
+            """);
+
             System.out.println("Database dan tabel berhasil dibuat!");
 
         } catch (Exception e) {
