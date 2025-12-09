@@ -49,7 +49,7 @@ public class MenuInputNilai extends JFrame {
         gbc.gridx = 1;
         panel.add(cbKodeMK, gbc);
 
-        loadKodeMK();  // LOAD DATA MK
+        loadKodeMK();  // LOAD MK sesuai dosen pengampu
 
         // ================== NIM ==================
         gbc.gridx = 0; gbc.gridy = 2;
@@ -89,15 +89,16 @@ public class MenuInputNilai extends JFrame {
         setVisible(true);
     }
 
-    // ================== LOAD KODE MK DARI DATABASE ==================
+    // ================== LOAD KODE MK SESUAI DOSEN ==================
     private void loadKodeMK() {
         try {
-            String sql = "SELECT DISTINCT kode_mk FROM krs";
+            String sql = "SELECT kode_mk_ampu FROM dosen WHERE nidn = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nidn);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                cbKodeMK.addItem(rs.getString("kode_mk"));
+                cbKodeMK.addItem(rs.getString("kode_mk_ampu"));
             }
 
             rs.close();
@@ -108,7 +109,7 @@ public class MenuInputNilai extends JFrame {
         }
     }
 
-    // ================== SIMPAN NILAI ==================
+    // ================== SIMPAN NILAI DENGAN VALIDASI DOSEN AMPU ==================
     private void saveNilai() {
         String kodeMk = (String) cbKodeMK.getSelectedItem();
         String nim = tfNIM.getText().trim();
@@ -121,12 +122,18 @@ public class MenuInputNilai extends JFrame {
         }
 
         try {
-            String sql = "UPDATE krs SET nilai = ? WHERE nim = ? AND kode_mk = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            // Hanya update KRS jika dosen ini memang yang mengajar
+            String sql = """
+                    UPDATE krs 
+                    SET nilai = ? 
+                    WHERE nim = ? AND kode_mk = ? AND nidn_dosen = ?
+                    """;
 
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, nilai);
             pstmt.setString(2, nim);
             pstmt.setString(3, kodeMk);
+            pstmt.setString(4, nidn);
 
             int affected = pstmt.executeUpdate();
 
@@ -134,7 +141,9 @@ public class MenuInputNilai extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nilai berhasil disimpan!");
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Data tidak ditemukan di KRS!", "Gagal", JOptionPane.WARNING_MESSAGE);
+                        "GAGAL! Dosen tidak mengajar MK ini atau data KRS tidak ditemukan.",
+                        "Tidak Diizinkan",
+                        JOptionPane.WARNING_MESSAGE);
             }
 
             pstmt.close();
@@ -145,7 +154,6 @@ public class MenuInputNilai extends JFrame {
         }
     }
 
-    // Testing (tanpa koneksi)
     public static void main(String[] args) {
         JOptionPane.showMessageDialog(null, "Jalankan dari program utama dengan Connection MySQL");
     }

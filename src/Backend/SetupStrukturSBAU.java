@@ -5,15 +5,12 @@ import java.sql.Statement;
 
 public class SetupStrukturSBAU {
     public static void main(String[] args) {
-        // Kita gunakan koneksi root awal untuk setup struktur
-        try (Connection conn = KoneksiAdmin.getConnection();
+        try (Connection conn = KoneksiSetup.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // === Tambahkan pembuatan database di sini ===
             stmt.execute("CREATE DATABASE IF NOT EXISTS sbau");
             stmt.execute("USE sbau");
 
-            // 1. Tabel Mahasiswa
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS mahasiswa (
                     nim VARCHAR(20) PRIMARY KEY,
@@ -22,17 +19,6 @@ public class SetupStrukturSBAU {
                 )
             """);
 
-            // 2. Tabel Dosen (kolom keahlian diganti dengan kode_mk_ampu)
-            stmt.execute("""
-                CREATE TABLE IF NOT EXISTS dosen (
-                    nidn VARCHAR(20) PRIMARY KEY,
-                    nama VARCHAR(100),
-                    kode_mk_ampu VARCHAR(10),
-                    FOREIGN KEY (kode_mk_ampu) REFERENCES matakuliah(kode_mk)
-                )
-            """);
-
-            // 3. Tabel Mata Kuliah
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS matakuliah (
                     kode_mk VARCHAR(10) PRIMARY KEY,
@@ -42,7 +28,15 @@ public class SetupStrukturSBAU {
                 )
             """);
 
-            // 4. Tabel KRS & Nilai
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS dosen (
+                    nidn VARCHAR(20) PRIMARY KEY,
+                    nama VARCHAR(100),
+                    kode_mk_ampu VARCHAR(10),
+                    FOREIGN KEY (kode_mk_ampu) REFERENCES matakuliah(kode_mk)
+                )
+            """);
+
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS krs (
                     id_krs INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,7 +50,7 @@ public class SetupStrukturSBAU {
                 )
             """);
 
-            System.out.println("Struktur Tabel SBAU Berhasil Dibuat!");
+            System.out.println("Database dan tabel berhasil dibuat!");
 
         } catch (Exception e) {
             e.printStackTrace();

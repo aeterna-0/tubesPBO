@@ -1,17 +1,47 @@
 package Backend;
 
-import Backend.KoneksiAdmin;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 
 public class InsertData {
-    public static void main(String[] args) {
 
-        // ==========================
-        // INSERT MAHASISWA
-        // ==========================
-        String sqlMahasiswa = "INSERT INTO mahasiswa (nim, nama, jurusan) VALUES (?, ?, ?)";
+    public static void main(String[] args) {
+        try (Connection conn = KoneksiAdmin.getConnection()) {
+            prosesInsert(conn);
+        } catch (Exception e) {
+            System.err.println("Koneksi gagal: " + e.getMessage());
+        }
+    }
+
+    public static void prosesInsert(Connection conn) {
+        System.out.println("=====================================");
+        System.out.println("       MULAI INSERT SEMUA DATA       ");
+        System.out.println("=====================================");
+
+        try (Statement stmt = conn.createStatement()) {
+
+            // MATIKAN FOREIGN KEY
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+            // TRUNCATE (reset tabel sebelum insert)
+            stmt.execute("TRUNCATE TABLE krs");
+            stmt.execute("TRUNCATE TABLE dosen");
+            stmt.execute("TRUNCATE TABLE mahasiswa");
+            stmt.execute("TRUNCATE TABLE matakuliah");
+
+            // HIDUPKAN FOREIGN KEY
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
+
+        } catch (Exception e) {
+            System.err.println("[ERROR RESET] " + e.getMessage());
+        }
+
+        // ====================================================
+        // =============== INSERT MAHASISWA ===================
+        // ====================================================
+        String sqlMahasiswa =
+                "INSERT INTO mahasiswa (nim, nama, jurusan) VALUES (?, ?, ?)";
 
         String[][] dataMahasiswa = {
                 {"2410511099", "Naqila Syaniwa", "Informatika"},
@@ -22,10 +52,24 @@ public class InsertData {
                 {"2410511133", "Muhammad Ega Pratama", "Informatika"}
         };
 
-        // ==========================
-        // INSERT MATA KULIAH
-        // ==========================
-        String sqlMK = "INSERT INTO matakuliah (kode_mk, nama_mk, sks, jadwal) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sqlMahasiswa)) {
+            for (String[] m : dataMahasiswa) {
+                ps.setString(1, m[0]);
+                ps.setString(2, m[1]);
+                ps.setString(3, m[2]);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            System.out.println("✓ Insert data mahasiswa sukses");
+        } catch (Exception e) {
+            System.err.println("[ERROR MAHASISWA] " + e.getMessage());
+        }
+
+        // ====================================================
+        // =============== INSERT MATA KULIAH ===================
+        // ====================================================
+        String sqlMK =
+                "INSERT INTO matakuliah (kode_mk, nama_mk, sks, jadwal) VALUES (?, ?, ?, ?)";
 
         Object[][] dataMK = {
                 {"INF124301", "Metode Penelitian", 3, "Selasa, 13:00-15:30 (R.301)"},
@@ -41,10 +85,25 @@ public class InsertData {
                 {"INF124311", "Keamanan Siber (CE.1)", 3, "Rabu, 13:00-15:30 (Lab 304)"}
         };
 
-        // ==========================
-        // INSERT DOSEN (dengan kode_mk_ampu)
-        // ==========================
-        String sqlDosen = "INSERT INTO dosen (nidn, nama, kode_mk_ampu) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sqlMK)) {
+            for (Object[] mk : dataMK) {
+                ps.setString(1, (String) mk[0]);
+                ps.setString(2, (String) mk[1]);
+                ps.setInt(3, (int) mk[2]);
+                ps.setString(4, (String) mk[3]);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            System.out.println("✓ Insert data matakuliah sukses");
+        } catch (Exception e) {
+            System.err.println("[ERROR MATA KULIAH] " + e.getMessage());
+        }
+
+        // ====================================================
+        // =============== INSERT DOSEN ===================
+        // ====================================================
+        String sqlDosen =
+                "INSERT INTO dosen (nidn, nama, kode_mk_ampu) VALUES (?, ?, ?)";
 
         String[][] dataDosen = {
                 {"19651110021211004", "Prof. Dr. Ir. Supriyanto, S.T., M.Sc., IPM.", "INF124302"},
@@ -64,51 +123,21 @@ public class InsertData {
                 {"19920505021211014", "Novi Trisman Hadi, S.Pd., M.Kom", "INF124305"}
         };
 
-        try (Connection conn = KoneksiAdmin.getConnection()) {
-
-            // INSERT MAHASISWA
-            try (PreparedStatement ps = conn.prepareStatement(sqlMahasiswa)) {
-                for (String[] m : dataMahasiswa) {
-                    ps.setString(1, m[0]);
-                    ps.setString(2, m[1]);
-                    ps.setString(3, m[2]);
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-                System.out.println("✓ Insert mahasiswa berhasil");
+        try (PreparedStatement ps = conn.prepareStatement(sqlDosen)) {
+            for (String[] d : dataDosen) {
+                ps.setString(1, d[0]);
+                ps.setString(2, d[1]);
+                ps.setString(3, d[2]);
+                ps.addBatch();
             }
-
-            // INSERT MATA KULIAH
-            try (PreparedStatement ps = conn.prepareStatement(sqlMK)) {
-                for (Object[] mk : dataMK) {
-                    ps.setString(1, (String) mk[0]);
-                    ps.setString(2, (String) mk[1]);
-                    ps.setInt(3, (int) mk[2]);
-                    ps.setString(4, (String) mk[3]);
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-                System.out.println("✓ Insert mata kuliah berhasil");
-            }
-
-            // INSERT DOSEN
-            try (PreparedStatement ps = conn.prepareStatement(sqlDosen)) {
-                for (String[] d : dataDosen) {
-                    ps.setString(1, d[0]);
-                    ps.setString(2, d[1]);
-                    ps.setString(3, d[2]);
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-                System.out.println("✓ Insert dosen berhasil");
-            }
-
-            System.out.println("=================================");
-            System.out.println("   SEMUA DATA BERHASIL DIINSERT  ");
-            System.out.println("=================================");
-
+            ps.executeBatch();
+            System.out.println("✓ Insert data dosen sukses");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("[ERROR DOSEN] " + e.getMessage());
         }
+
+        System.out.println("==================================");
+        System.out.println("   SEMUA DATA BERHASIL DIINSERT   ");
+        System.out.println("==================================");
     }
 }

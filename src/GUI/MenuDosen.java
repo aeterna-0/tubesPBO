@@ -99,7 +99,7 @@ public class MenuDosen extends JFrame {
         });
 
         btnLihatData.addActionListener(e -> {
-            new MenuLihatDataMahasiswa(conn);
+            new MenuLihatDataMahasiswa(conn, nidn);
         });
 
         // finalize
