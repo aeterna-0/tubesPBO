@@ -11,6 +11,7 @@ public class SetupStrukturSBAU {
             stmt.execute("CREATE DATABASE IF NOT EXISTS sbau");
             stmt.execute("USE sbau");
 
+            // 1. Tabel Mahasiswa
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS mahasiswa (
                     nim VARCHAR(20) PRIMARY KEY,
@@ -19,33 +20,34 @@ public class SetupStrukturSBAU {
                 )
             """);
 
+            // 2. Tabel Dosen
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS dosen (
+                    nidn VARCHAR(20) PRIMARY KEY,
+                    nama VARCHAR(100)
+                )
+            """);
+
+            // 3. Tabel Mata Kuliah
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS matakuliah (
                     kode_mk VARCHAR(10) PRIMARY KEY,
                     nama_mk VARCHAR(100),
                     sks INT,
-                    jadwal VARCHAR(100)
+                    jadwal VARCHAR(100),
+                    nidn_dosen VARCHAR(20),
+                    FOREIGN KEY (nidn_dosen) REFERENCES dosen(nidn)
                 )
             """);
 
-            stmt.execute("""
-                CREATE TABLE IF NOT EXISTS dosen (
-                    nidn VARCHAR(20) PRIMARY KEY,
-                    nama VARCHAR(100),
-                    kode_mk_ampu VARCHAR(10),
-                    FOREIGN KEY (kode_mk_ampu) REFERENCES matakuliah(kode_mk)
-                )
-            """);
-
+            // 4. Tabel KRS
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS krs (
                     id_krs INT AUTO_INCREMENT PRIMARY KEY,
                     nim VARCHAR(20),
-                    nidn_dosen VARCHAR(20),
                     kode_mk VARCHAR(10),
                     nilai VARCHAR(2),
                     FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
-                    FOREIGN KEY (nidn_dosen) REFERENCES dosen(nidn),
                     FOREIGN KEY (kode_mk) REFERENCES matakuliah(kode_mk)
                 )
             """);
