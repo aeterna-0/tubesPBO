@@ -1,7 +1,5 @@
 package Backend;
 
-import Backend.KoneksiAdmin;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -65,7 +63,7 @@ public class RegisterUserMySQL {
         executeKueriUser(sqlCreate, sqlGrant, "Admin " + username);
     }
 
-    // 2. Membuat DOSEN (Perbaikan: Ditambah izin SELECT ke tabel Dosen)
+    // 2. Membuat DOSEN (Diperbarui: Ditambah izin tabel tugas)
     public static void createDosen(String nidn, String password, String nama) {
         // Masukkan data profil ke tabel dosen dulu
         insertDataDosen(nidn, nama);
@@ -74,18 +72,19 @@ public class RegisterUserMySQL {
         String sqlCreate = "CREATE USER IF NOT EXISTS '" + nidn + "'@'localhost' IDENTIFIED BY '" + password + "'";
 
         // PRIVILEGES DOSEN:
-        // - SELECT, INSERT, UPDATE tabel KRS (Untuk Input Nilai)
-        // - SELECT tabel MAHASISWA (Lihat siapa yang diajar)
-        // - SELECT tabel MATAKULIAH (Lihat daftar MK)
-        // - [BARU] SELECT tabel DOSEN (Supaya bisa melihat Profil/Nama sendiri saat Login)
+        // - SELECT, INSERT, UPDATE tabel KRS (Input Nilai)
+        // - SELECT tabel MAHASISWA
+        // - SELECT tabel MATAKULIAH
+        // - SELECT tabel DOSEN
+        // - [BARU] SELECT, INSERT, UPDATE tabel TUGAS  ← DITAMBAHKAN
 
         String sqlGrant1 = "GRANT SELECT, INSERT, UPDATE ON SBAU.krs TO '" + nidn + "'@'localhost'";
         String sqlGrant2 = "GRANT SELECT ON SBAU.mahasiswa TO '" + nidn + "'@'localhost'";
         String sqlGrant3 = "GRANT SELECT ON SBAU.matakuliah TO '" + nidn + "'@'localhost'";
-        String sqlGrant4 = "GRANT SELECT ON SBAU.dosen TO '" + nidn + "'@'localhost'"; // <--- UPDATE DISINI
+        String sqlGrant4 = "GRANT SELECT ON SBAU.dosen TO '" + nidn + "'@'localhost'";
+        String sqlGrant5 = "GRANT SELECT, INSERT, UPDATE ON SBAU.tugas TO '" + nidn + "'@'localhost'"; // <--- BARU
 
-        // Gabungkan semua grant
-        String allGrants = sqlGrant1 + "; " + sqlGrant2 + "; " + sqlGrant3 + "; " + sqlGrant4;
+        String allGrants = sqlGrant1 + "; " + sqlGrant2 + "; " + sqlGrant3 + "; " + sqlGrant4 + "; " + sqlGrant5;
 
         executeKueriUser(sqlCreate, allGrants, "Dosen " + nidn);
     }
@@ -152,7 +151,7 @@ public class RegisterUserMySQL {
     private static void insertDataDosen(String nidn, String nama) {
         try (Connection conn = KoneksiAdmin.getConnection();
              Statement stmt = conn.createStatement()) {
-            String sql = "INSERT IGNORE INTO dosen VALUES ('"+nidn+"', '"+nama+"', 'Ahli')";
+            String sql = "INSERT IGNORE INTO dosen VALUES ('"+nidn+"', '"+nama+"')";
             stmt.execute(sql);
         } catch (Exception e) {}
     }

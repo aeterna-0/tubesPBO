@@ -74,6 +74,7 @@ public class MenuDosen extends JFrame {
 
         JButton btnInputNilai = createStyledButton("Input Nilai Mahasiswa");
         JButton btnLihatData = createStyledButton("Lihat Data Mahasiswa");
+        JButton btnTambahTugas = createStyledButton("Tambah Tugas");
 
         // letakkan dua tombol dengan jarak yang cukup, center
         gbc.gridx = 0;
@@ -85,6 +86,10 @@ public class MenuDosen extends JFrame {
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 0, 0);
         rightPanel.add(btnLihatData, gbc);
+
+        gbc.gridy = 2;
+        gbc.insets = new Insets(30, 0, 0, 0);
+        rightPanel.add(btnTambahTugas, gbc);
 
         add(rightPanel, BorderLayout.CENTER);
 
@@ -100,6 +105,10 @@ public class MenuDosen extends JFrame {
 
         btnLihatData.addActionListener(e -> {
             new MenuLihatDataMahasiswa(conn, nidn);
+        });
+
+        btnTambahTugas.addActionListener(e -> {
+            new MenuTambahTugas(conn, nidn);
         });
 
         // finalize

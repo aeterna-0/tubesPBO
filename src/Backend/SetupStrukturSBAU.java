@@ -52,6 +52,17 @@ public class SetupStrukturSBAU {
                 )
             """);
 
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS tugas (
+                    id_tugas INT AUTO_INCREMENT PRIMARY KEY,
+                    kode_mk VARCHAR(10),
+                    judul VARCHAR(100),
+                    deskripsi TEXT,
+                    deadline DATE,
+                    FOREIGN KEY (kode_mk) REFERENCES matakuliah(kode_mk)
+                )
+            """);
+
             System.out.println("Database dan tabel berhasil dibuat!");
 
         } catch (Exception e) {
