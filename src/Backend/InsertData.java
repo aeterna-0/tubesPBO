@@ -1,34 +1,112 @@
+package Backend;
+
 import Backend.KoneksiAdmin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+
 public class InsertData {
     public static void main(String[] args) {
-        String sql = "INSERT INTO mahasiswa (nim, nama, jurusan) VALUES (?, ?, ?)";
-        // Data 10 mahasiswa
+
+        // ==========================
+        // INSERT MAHASISWA
+        // ==========================
+        String sqlMahasiswa = "INSERT INTO mahasiswa (nim, nama, jurusan) VALUES (?, ?, ?)";
+
         String[][] dataMahasiswa = {
-                {"M001", "Ahmad Billal", "Informatika"},
-                {"M002", "Raffi Anggi", "Sistem Informasi"},
-                {"M003", "Raihan Oktoleven Ramadhan", "Teknik Komputer"},
-                {"M004", "Muhammad Dunde", "Informatika"},
-                {"M005", "Eko Wijaya", "Teknik Komputer"},
-                {"M006", "Fajar Nugroho", "Sistem Informasi"},
-                {"M007", "Gita Permata", "Informatika"},
-                {"M008", "Hendra Saputra", "Teknik Komputer"},
-                {"M009", "Intan Kusuma", "Sistem Informasi"},
-                {"M010", "Joko Prasetyo", "Informatika"}
+                {"2410511099", "Naqila Syaniwa", "Informatika"},
+                {"2410511104", "Raffi Anggi Rachman Budianto", "Informatika"},
+                {"2410511116", "Ahmad Billal", "Informatika"},
+                {"2410511117", "Rafka Nadimsyah Radisi", "Informatika"},
+                {"2410511125", "Hazell Maulan Al Khafi", "Informatika"},
+                {"2410511133", "Muhammad Ega Pratama", "Informatika"}
         };
-        try (Connection conn = KoneksiAdmin.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            // Loop insert 10 data
-            for (String[] mhs : dataMahasiswa) {
-                pstmt.setString(1, mhs[0]); // nim
-                pstmt.setString(2, mhs[1]); // nama
-                pstmt.setString(3, mhs[2]); // jurusan
-                pstmt.addBatch();
+
+        // ==========================
+        // INSERT MATA KULIAH
+        // ==========================
+        String sqlMK = "INSERT INTO matakuliah (kode_mk, nama_mk, sks, jadwal) VALUES (?, ?, ?, ?)";
+
+        Object[][] dataMK = {
+                {"INF124301", "Metode Penelitian", 3, "Selasa, 13:00-15:30 (R.301)"},
+                {"INF124302", "Jaringan Komputer", 2, "Jumat, 09:40-11:20 (R.303)"},
+                {"INF124303", "Praktikum Jaringan Komputer", 1, "Selasa, 10:30-12:10 (Lab 301)"},
+                {"INF124304", "Manajemen Proyek Perangkat Lunak", 3, "Selasa, 15:30-18:00 (R.302)"},
+                {"INF124305", "Sistem Operasi", 2, "Kamis, 08:00-09:40 (R.403)"},
+                {"INF124306", "Praktikum Sistem Operasi", 1, "Kamis, 10:30-12:10 (Lab 402)"},
+                {"INF124307", "Kompleksitas Algoritma", 3, "Rabu, 08:50-10:30 (R.401)"},
+                {"INF124308", "Pemrograman Berorientasi Objek", 2, "Rabu, 07:10-08:50 (R.301)"},
+                {"INF124309", "Praktikum PBO", 1, "Kamis, 14:40-16:20 (Lab 403)"},
+                {"INF124310", "Interaksi Manusia dan Komputer", 3, "Jumat, 13:30-16:00 (R.202)"},
+                {"INF124311", "Keamanan Siber (CE.1)", 3, "Rabu, 13:00-15:30 (Lab 304)"}
+        };
+
+        // ==========================
+        // INSERT DOSEN (dengan kode_mk_ampu)
+        // ==========================
+        String sqlDosen = "INSERT INTO dosen (nidn, nama, kode_mk_ampu) VALUES (?, ?, ?)";
+
+        String[][] dataDosen = {
+                {"19651110021211004", "Prof. Dr. Ir. Supriyanto, S.T., M.Sc., IPM.", "INF124302"},
+                {"19701205021211008", "Assoc. Prof. Dr. Choo Yun Huoy", "INF124307"},
+                {"19720520021211002", "Dr. Widya Cholil, M.I.T", "INF124310"},
+                {"19741010021211013", "Dr. Mufid Nilmada, SSi., MMSI", "INF124308"},
+                {"19760814021211011", "Dr. Indra Permana Solihin, M.Kom", "INF124301"},
+                {"19780222021211010", "Darius Antoni, Ph.D.", "INF124304"},
+                {"19811220021211015", "Ferdiansyah, M.Kom., Ph.D.", "INF124305"},
+                {"19830809021211001", "Ika Nurlaili Isnainiyah, S.Kom., M.Sc.", "INF124310"},
+                {"19850725021211005", "Henki Bayu Seta, S.Kom., MTI.", "INF124311"},
+                {"19860618021211009", "Sanggi Bayu Ardika, S.Kom., M.Kom", "INF124304"},
+                {"19880912021211006", "Hamonangan Kinantan P., M.T.", "INF124311"},
+                {"19890130021211007", "Ichsan Mardani, S.Kom., MSc.", "INF124307"},
+                {"19900315021211003", "Nurhuda Maulana, S.T., M.T.", "INF124302"},
+                {"19910417021211012", "Musthofa Galih Pradana, S.Kom., M.Kom", "INF124308"},
+                {"19920505021211014", "Novi Trisman Hadi, S.Pd., M.Kom", "INF124305"}
+        };
+
+        try (Connection conn = KoneksiAdmin.getConnection()) {
+
+            // INSERT MAHASISWA
+            try (PreparedStatement ps = conn.prepareStatement(sqlMahasiswa)) {
+                for (String[] m : dataMahasiswa) {
+                    ps.setString(1, m[0]);
+                    ps.setString(2, m[1]);
+                    ps.setString(3, m[2]);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                System.out.println("✓ Insert mahasiswa berhasil");
             }
-            pstmt.executeBatch();
-            System.out.println("10 data mahasiswa berhasil dimasukkan!");
+
+            // INSERT MATA KULIAH
+            try (PreparedStatement ps = conn.prepareStatement(sqlMK)) {
+                for (Object[] mk : dataMK) {
+                    ps.setString(1, (String) mk[0]);
+                    ps.setString(2, (String) mk[1]);
+                    ps.setInt(3, (int) mk[2]);
+                    ps.setString(4, (String) mk[3]);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                System.out.println("✓ Insert mata kuliah berhasil");
+            }
+
+            // INSERT DOSEN
+            try (PreparedStatement ps = conn.prepareStatement(sqlDosen)) {
+                for (String[] d : dataDosen) {
+                    ps.setString(1, d[0]);
+                    ps.setString(2, d[1]);
+                    ps.setString(3, d[2]);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                System.out.println("✓ Insert dosen berhasil");
+            }
+
+            System.out.println("=================================");
+            System.out.println("   SEMUA DATA BERHASIL DIINSERT  ");
+            System.out.println("=================================");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
