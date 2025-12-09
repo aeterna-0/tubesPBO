@@ -1,6 +1,8 @@
 package GUI;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
@@ -10,151 +12,273 @@ public class MenuInputNilai extends JFrame {
     private String nidn;
 
     private JComboBox<String> cbKodeMK;
-    private JTextField tfNIM;
-    private JComboBox<String> cbNilai;
-    private JButton btnSimpan;
+    private JTable tableMahasiswa;
+    private DefaultTableModel tableModel;
+    private JButton btnInputNilai;
 
     public MenuInputNilai(Connection conn, String nidn) {
         super("Input Nilai Mahasiswa");
         this.conn = conn;
         this.nidn = nidn;
 
-        setSize(500, 350);
+        setSize(900, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        GridBagConstraints gbc = new GridBagConstraints();
+        // ========================= LEFT PANEL (GRADIENT) =========================
+        JPanel leftPanel = new GradientPanel();
+        leftPanel.setPreferredSize(new Dimension(300, 0));
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));  // LEBIH RAPI
 
-        JLabel lblTitle = new JLabel("Input Nilai Mahasiswa");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        JLabel lblTitle = new JLabel("<html><div style='font-size:30pt; font-weight:600;color:white;'>Input<br>Nilai</div></html>");
+        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 0, 20, 0);
-        panel.add(lblTitle, gbc);
+        JLabel lblSub = new JLabel("<html><div style='font-size:13pt; color:white;'>Pilih MK dan input nilai mahasiswa</div></html>");
+        lblSub.setBorder(BorderFactory.createEmptyBorder(10, 0, 25, 0));
+        lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // ================== KODE MK ==================
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(lblTitle);
+        leftPanel.add(lblSub);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        panel.add(new JLabel("Kode Mata Kuliah:"), gbc);
+        JLabel lblMK = new JLabel("Pilih Kode MK:");
+        lblMK.setForeground(Color.WHITE);
+        lblMK.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblMK.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        leftPanel.add(lblMK);
+        leftPanel.add(Box.createVerticalStrut(8));
 
         cbKodeMK = new JComboBox<>();
-        cbKodeMK.setPreferredSize(new Dimension(200, 28));
+        cbKodeMK.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbKodeMK.setPreferredSize(new Dimension(220, 30));
+        cbKodeMK.setMaximumSize(new Dimension(220, 30));
+        loadKodeMK();
 
-        gbc.gridx = 1;
-        panel.add(cbKodeMK, gbc);
+        JPanel cbWrapper = new JPanel();
+        cbWrapper.setOpaque(false);
+        cbWrapper.setLayout(new BoxLayout(cbWrapper, BoxLayout.X_AXIS));
+        cbWrapper.add(Box.createHorizontalGlue());
+        cbWrapper.add(cbKodeMK);
+        cbWrapper.add(Box.createHorizontalGlue());
 
-        loadKodeMK();  // LOAD MK sesuai dosen pengampu
+        leftPanel.add(cbWrapper);
+        leftPanel.add(Box.createVerticalStrut(15));
 
-        // ================== NIM ==================
-        gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(new JLabel("NIM Mahasiswa:"), gbc);
+        JButton btnLoad = styledSmallButton("Tampilkan Mahasiswa");
+        btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        tfNIM = new JTextField();
-        tfNIM.setPreferredSize(new Dimension(200, 28));
+        JPanel btnWrapper = new JPanel();
+        btnWrapper.setOpaque(false);
+        btnWrapper.setLayout(new BoxLayout(btnWrapper, BoxLayout.X_AXIS));
+        btnWrapper.add(Box.createHorizontalGlue());
+        btnWrapper.add(btnLoad);
+        btnWrapper.add(Box.createHorizontalGlue());
 
-        gbc.gridx = 1;
-        panel.add(tfNIM, gbc);
+        leftPanel.add(btnWrapper);
+        leftPanel.add(Box.createVerticalGlue());
 
-        // ================== NILAI ==================
-        gbc.gridx = 0; gbc.gridy = 3;
-        panel.add(new JLabel("Nilai:"), gbc);
+        add(leftPanel, BorderLayout.WEST);
 
-        cbNilai = new JComboBox<>(new String[]{"A", "B", "C", "D", "E"});
-        cbNilai.setPreferredSize(new Dimension(200, 28));
 
-        gbc.gridx = 1;
-        panel.add(cbNilai, gbc);
+        // ========================= TABLE PANEL =========================
+        tableModel = new DefaultTableModel(new Object[]{"NIM", "Nama", "Nilai"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
-        // ================== BUTTON SIMPAN ==================
-        btnSimpan = new JButton("Simpan Nilai");
-        btnSimpan.setPreferredSize(new Dimension(180, 35));
-        btnSimpan.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        tableMahasiswa = new JTable(tableModel);
+        tableMahasiswa.setRowHeight(28);
+        tableMahasiswa.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tableMahasiswa.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        gbc.gridx = 0; gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 0, 10, 0);
-        panel.add(btnSimpan, gbc);
+        // center column "nilai"
+        DefaultTableCellRenderer center = new DefaultTableCellRenderer();
+        center.setHorizontalAlignment(JLabel.CENTER);
+        tableMahasiswa.getColumnModel().getColumn(2).setCellRenderer(center);
 
-        add(panel);
+        JScrollPane scroll = new JScrollPane(tableMahasiswa);
+        scroll.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // ACTION SAVE
-        btnSimpan.addActionListener(e -> saveNilai());
+        add(scroll, BorderLayout.CENTER);
+
+        // ========================= INPUT BUTTON =========================
+        btnInputNilai = new JButton("Input Nilai");
+        btnInputNilai.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnInputNilai.setBackground(new Color(255, 140, 0));
+        btnInputNilai.setForeground(Color.WHITE);
+        btnInputNilai.setFocusPainted(false);
+        btnInputNilai.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnInputNilai.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setBackground(Color.WHITE);
+        bottomPanel.add(btnInputNilai);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // ========================= EVENT =========================
+        btnLoad.addActionListener(e -> loadMahasiswa());
+        btnInputNilai.addActionListener(e -> inputNilaiPopup());
 
         setVisible(true);
     }
 
-    // ================== LOAD KODE MK SESUAI DOSEN ==================
+    // ========================= LOAD MK =========================
     private void loadKodeMK() {
         try {
-            String sql = "SELECT kode_mk_ampu FROM dosen WHERE nidn = ?";
+            String sql = "SELECT kode_mk, nama_mk FROM matakuliah WHERE nidn_dosen = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, nidn);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                cbKodeMK.addItem(rs.getString("kode_mk_ampu"));
+                String kode = rs.getString("kode_mk");
+                String nama = rs.getString("nama_mk");
+
+                cbKodeMK.addItem("(" + kode + ") " + nama);
             }
-
-            rs.close();
-            stmt.close();
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error Load MK: " + e.getMessage());
         }
     }
 
-    // ================== SIMPAN NILAI DENGAN VALIDASI DOSEN AMPU ==================
-    private void saveNilai() {
-        String kodeMk = (String) cbKodeMK.getSelectedItem();
-        String nim = tfNIM.getText().trim();
-        String nilai = (String) cbNilai.getSelectedItem();
+    // ========================= LOAD MAHASISWA =========================
+    private void loadMahasiswa() {
+        tableModel.setRowCount(0);
 
-        if (nim.isEmpty()) {
+        String selected = (String) cbKodeMK.getSelectedItem();
+        if (selected == null) return;
+
+        String kodeMk = selected.substring(1, selected.indexOf(")")); // ekstrak kode
+
+        try {
+            String sql = """
+            SELECT k.nim, m.nama, k.nilai
+            FROM krs k 
+            JOIN mahasiswa m ON k.nim = m.nim
+            WHERE k.kode_mk = ?
+        """;
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, kodeMk);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                tableModel.addRow(new Object[]{
+                        rs.getString("nim"),
+                        rs.getString("nama"),
+                        rs.getString("nilai") == null ? "-" : rs.getString("nilai")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error Load Mahasiswa: " + e.getMessage());
+        }
+    }
+
+
+    // ========================= POPUP INPUT =========================
+    private void inputNilaiPopup() {
+
+        int row = tableMahasiswa.getSelectedRow();
+        if (row == -1) {
             JOptionPane.showMessageDialog(this,
-                    "NIM tidak boleh kosong!", "Error", JOptionPane.ERROR_MESSAGE);
+                    "Pilih mahasiswa terlebih dahulu!",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        String nim = tableModel.getValueAt(row, 0).toString();
+
+        String selected = cbKodeMK.getSelectedItem().toString();
+        String kodeMk = selected.substring(1, selected.indexOf(")"));
+
+        JComboBox<String> cbNilai = new JComboBox<>(new String[]{"A", "A-", "B+", "B", "B-", "C", "D", "E"});
+        cbNilai.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbNilai.setPreferredSize(new Dimension(80, 30));
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Nilai untuk NIM " + nim + ": "));
+        panel.add(cbNilai);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Input Nilai",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            simpanNilai(nim, kodeMk, cbNilai.getSelectedItem().toString());
+            loadMahasiswa();
+        }
+    }
+
+    // ========================= SIMPAN NILAI =========================
+    private void simpanNilai(String nim, String kodeMk, String nilai) {
+
         try {
-            // Hanya update KRS jika dosen ini memang yang mengajar
             String sql = """
                     UPDATE krs 
-                    SET nilai = ? 
-                    WHERE nim = ? AND kode_mk = ? AND nidn_dosen = ?
+                    SET nilai = ?
+                    WHERE nim = ? AND kode_mk = ?
                     """;
 
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, nilai);
             pstmt.setString(2, nim);
             pstmt.setString(3, kodeMk);
-            pstmt.setString(4, nidn);
 
-            int affected = pstmt.executeUpdate();
+            int updated = pstmt.executeUpdate();
 
-            if (affected > 0) {
+            if (updated > 0) {
                 JOptionPane.showMessageDialog(this, "Nilai berhasil disimpan!");
             } else {
-                JOptionPane.showMessageDialog(this,
-                        "GAGAL! Dosen tidak mengajar MK ini atau data KRS tidak ditemukan.",
-                        "Tidak Diizinkan",
-                        JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan nilai.");
             }
 
-            pstmt.close();
-
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                    "SQL Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "SQL Error: " + e.getMessage());
         }
     }
 
-    public static void main(String[] args) {
-        JOptionPane.showMessageDialog(null, "Jalankan dari program utama dengan Connection MySQL");
+    // ========================= STYLED BUTTON =========================
+    private JButton styledSmallButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setBackground(Color.WHITE);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(80, 80, 80), 2, true),
+                BorderFactory.createEmptyBorder(8, 14, 8, 14)
+        ));
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return btn;
+    }
+
+    // ========================= GRADIENT PANEL =========================
+    static class GradientPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            int w = getWidth();
+            int h = getHeight();
+
+            Color top = new Color(255, 140, 0);
+            Color bottom = new Color(255, 199, 153);
+
+            GradientPaint gp = new GradientPaint(0, 0, top, 0, h, bottom);
+            g2.setPaint(gp);
+            g2.fillRect(0, 0, w, h);
+            g2.dispose();
+        }
     }
 }

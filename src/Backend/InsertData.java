@@ -70,21 +70,21 @@ public class InsertData {
                 "INSERT INTO dosen (nidn, nama) VALUES (?, ?)";
 
         String[][] dataDosen = {
-                {"19651110021211004", "Prof. Dr. Ir. Supriyanto"},
+                {"19651110021211004", "Prof. Dr. Ir. Supriyanto, S.T., M.Sc., IPM."},
                 {"19701205021211008", "Assoc. Prof. Dr. Choo Yun Huoy"},
-                {"19720520021211002", "Dr. Widya Cholil"},
-                {"19741010021211013", "Dr. Mufid Nilmada"},
-                {"19760814021211011", "Dr. Indra Permana Solihin"},
-                {"19780222021211010", "Darius Antoni"},
-                {"19811220021211015", "Ferdiansyah"},
-                {"19830809021211001", "Ika Nurlaili Isnainiyah"},
-                {"19850725021211005", "Henki Bayu Seta"},
-                {"19860618021211009", "Sanggi Bayu Ardika"},
-                {"19880912021211006", "Hamonangan Kinantan"},
-                {"19890130021211007", "Ichsan Mardani"},
-                {"19900315021211003", "Nurhuda Maulana"},
-                {"19910417021211012", "Musthofa Galih Pradana"},
-                {"19920505021211014", "Novi Trisman Hadi"}
+                {"19720520021211002", "Dr. Widya Cholil, M.I.T"},
+                {"19741010021211013", "Dr. Mufid Nilmada, SSi., MMSI"},
+                {"19760814021211011", "Dr. Indra Permana Solihin, M.Kom"},
+                {"19780222021211010", "Darius Antoni, Ph.D."},
+                {"19811220021211015", "Ferdiansyah, M.Kom., Ph.D."},
+                {"19830809021211001", "Ika Nurlaili Isnainiyah, S.Kom., M.Sc."},
+                {"19850725021211005", "Henki Bayu Seta, S.Kom., MTI."},
+                {"19860618021211009", "Sanggi Bayu Ardika, S.Kom., M.Kom"},
+                {"19880912021211006", "Hamonangan Kinantan P., M.T."},
+                {"19890130021211007", "Ichsan Mardani, S.Kom., MSc."},
+                {"19900315021211003", "Nurhuda Maulana, S.T., M.T."},
+                {"19910417021211012", "Musthofa Galih Pradana, S.Kom., M.Kom"},
+                {"19920505021211014", "Novi Trisman Hadi, S.Pd., M.Kom"}
         };
 
         try (PreparedStatement ps = conn.prepareStatement(sqlDosen)) {
@@ -109,16 +109,18 @@ public class InsertData {
 
         Object[][] dataMK = {
                 {"INF124301", "Metode Penelitian", 3, "Selasa, 13:00-15:30", "19760814021211011"},
-                {"INF124302", "Jaringan Komputer", 2, "Jumat, 09:40-11:20", "19900315021211003"},
+                {"INF124302", "Jaringan Komputer", 2, "Jumat, 09:40-11:20", "19651110021211004"},
                 {"INF124303", "Praktikum Jaringan", 1, "Selasa, 10:30-12:10", "19900315021211003"},
-                {"INF124304", "Manajemen Projek", 3, "Selasa, 15:30-18:00", "19780222021211010"},
+                {"INF124304", "Manajemen Projek Perangkat Lunak", 3, "Selasa, 15:30-18:00", "19780222021211010"},
                 {"INF124305", "Sistem Operasi", 2, "Kamis, 08:00-09:40", "19811220021211015"},
                 {"INF124306", "Praktikum Sistem Operasi", 1, "Kamis, 10:30-12:10", "19811220021211015"},
                 {"INF124307", "Kompleksitas Algoritma", 3, "Rabu, 08:50-10:30", "19701205021211008"},
                 {"INF124308", "Pemrograman OOP", 2, "Rabu, 07:10-08:50", "19741010021211013"},
                 {"INF124309", "Praktikum PBO", 1, "Kamis, 14:40-16:20", "19741010021211013"},
                 {"INF124310", "Interaksi Manusia Komputer", 3, "Jumat, 13:30-16:00", "19720520021211002"},
-                {"INF124311", "Keamanan Siber", 3, "Rabu, 13:00-15:30", "19850725021211005"}
+                {"INF124311", "Keamanan Siber", 3, "Rabu, 13:00-15:30", "19850725021211005"},
+                {"INF124312", "Interaksi Manusia Komputer", 3, "Jumat, 13:30-16:00", "19830809021211001"},
+                {"INF124313", "Manajemen Projek Perangkat Lunak", 3, "Selasa, 15:30-18:00", "19830809021211001"},
         };
 
         try (PreparedStatement ps = conn.prepareStatement(sqlMK)) {

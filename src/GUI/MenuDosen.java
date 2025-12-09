@@ -142,8 +142,8 @@ public class MenuDosen extends JFrame {
             Graphics2D g2 = (Graphics2D) g.create();
             int w = getWidth();
             int h = getHeight();
-            Color top = new Color(0, 122, 255);
-            Color bottom = new Color(153, 204, 255);
+            Color top = new Color(255, 140, 0);
+            Color bottom = new Color(255, 199, 153);
             GradientPaint gp = new GradientPaint(0, 0, top, 0, h, bottom);
             g2.setPaint(gp);
             g2.fillRect(0, 0, w, h);
